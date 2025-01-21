@@ -20,4 +20,4 @@ Visit the live site at: https://apffm.github.io/blockchain-flashcards/
 - Mobile-friendly design
 - Keyboard navigation support
 
-Last updated: January 21, 2024 
+Last updated: January 21, 2025 
