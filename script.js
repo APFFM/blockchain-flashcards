@@ -94,51 +94,33 @@ function setupEventListeners() {
       updateProgress();
     }
   };
-}
 
-// Enhance the controls with better visual feedback
-function drawControls() {
-  let buttonY = 420;
-  let buttonHeight = 40;
-  
-  // Detail toggle button
-  let isHovered = mouseX > 50 && mouseX < 170 && mouseY > buttonY && mouseY < buttonY + buttonHeight;
-  fill(isHovered ? color(0, 119, 182) : 200);
-  rect(50, buttonY, 120, buttonHeight, 5);
-  fill(isHovered ? 255 : 0);
-  textAlign(CENTER, CENTER);
-  text(showDetail ? "Hide Details" : "Show Details", 110, buttonY + buttonHeight/2);
-  
-  // Navigation buttons with hover effects
-  ['Previous', 'Next', 'Reset'].forEach((label, i) => {
-    let x = 200 + i * 140;
-    isHovered = mouseX > x && mouseX < x + 120 && mouseY > buttonY && mouseY < buttonY + buttonHeight;
-    fill(isHovered ? color(0, 119, 182) : 200);
-    rect(x, buttonY, 120, buttonHeight, 5);
-    fill(isHovered ? 255 : 0);
-    text(label, x + 60, buttonY + buttonHeight/2);
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      if (currentCard > 0) {
+        currentCard--;
+      } else if (currentTopic > 0) {
+        currentTopic--;
+        currentCard = topics[currentTopic].cards.length - 1;
+      }
+      renderTopics();
+      renderCard();
+    } else if (e.key === 'ArrowRight') {
+      if (currentCard < topics[currentTopic].cards.length - 1) {
+        currentCard++;
+      } else if (currentTopic < topics.length - 1) {
+        currentTopic++;
+        currentCard = 0;
+      }
+      renderTopics();
+      renderCard();
+    } else if (e.key === ' ') { // Spacebar
+      showDetail = !showDetail;
+      renderCard();
+      e.preventDefault(); // Prevent page scrolling
+    }
   });
-  
-  textAlign(LEFT, BASELINE);
-}
-
-// Add keyboard navigation
-function keyPressed() {
-  if (keyCode === LEFT_ARROW) {
-    if (currentCard > 0) currentCard--;
-    else if (currentTopic > 0) {
-      currentTopic--;
-      currentCard = topics[currentTopic].cards.length-1;
-    }
-  } else if (keyCode === RIGHT_ARROW) {
-    if (currentCard < topics[currentTopic].cards.length-1) currentCard++;
-    else if (currentTopic < topics.length-1) {
-      currentTopic++;
-      currentCard = 0;
-    }
-  } else if (keyCode === 32) { // Spacebar
-    showDetail = !showDetail;
-  }
 }
 
 // Initialize the app
