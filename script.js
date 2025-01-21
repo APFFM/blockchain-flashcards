@@ -1,4 +1,4 @@
-import courseContent from '/blockchain-flashcards/content.js';
+import courseContent from './content.js';
 
 // Replace the existing topics array
 let topics = courseContent.topics;
@@ -34,62 +34,11 @@ function renderTopics() {
 }
 
 function renderCard() {
-  let card = topics[currentTopic].cards[currentCard];
+  const card = topics[currentTopic].cards[currentCard];
   
-  // Card background with subtle shadow
-  fill(255);
-  stroke(200);
-  drawingContext.shadowOffsetX = 5;
-  drawingContext.shadowOffsetY = 5;
-  drawingContext.shadowBlur = 10;
-  drawingContext.shadowColor = 'rgba(0,0,0,0.2)';
-  rect(50, 100, width-100, 300, 10);
-  drawingContext.shadowColor = 'rgba(0,0,0,0)';
-  
-  // Question/Answer section
-  fill(0);
-  textSize(24);
-  textStyle(BOLD);
-  text(showDetail ? "Answer:" : "Question:", 70, 130);
-  
-  textSize(20);
-  textStyle(NORMAL);
-  text(showDetail ? card.answer : card.question, 70, 160, width-140);
-  
-  // Detail section with improved formatting
-  if (showDetail && card.detail) {
-    textSize(16);
-    fill(80);
-    let detailY = 200;
-    
-    // Split detail into paragraphs
-    let paragraphs = card.detail.split('\n');
-    paragraphs.forEach(p => {
-      text(p, 70, detailY, width-140);
-      detailY += textWidth(p) / (width-140) * 25 + 30;
-    });
-  }
-  
-  // Show additional fields if present
-  if (showDetail) {
-    let y = 320;
-    textSize(14);
-    
-    if (card.diagram) {
-      fill(100);
-      text("Diagram:", 70, y);
-      fill(0);
-      text(card.diagram, 140, y);
-      y += 30;
-    }
-    
-    if (card.critical) {
-      fill(100);
-      text("Critical Thinking:", 70, y);
-      fill(0);
-      text(card.critical, 180, y);
-    }
-  }
+  document.getElementById('question').textContent = card.question;
+  document.getElementById('answer').textContent = showDetail ? card.answer : '';
+  document.getElementById('detail').textContent = showDetail ? card.detail : '';
   
   // Mark card as seen
   const cardId = `${currentTopic}-${currentCard}`;
