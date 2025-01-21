@@ -18,6 +18,9 @@ Visit the live site at: https://apffm.github.io/blockchain-flashcards/
 - Progress tracking
 - Topic-based organization
 - Mobile-friendly design
-- Keyboard navigation support
+- Keyboard navigation support:
+  - Left Arrow: Previous card
+  - Right Arrow: Next card
+  - Spacebar: Show/Hide answer
 
 Last updated: January 21, 2025 
