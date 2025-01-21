@@ -17,4 +17,7 @@ Visit the live site at: https://apffm.github.io/blockchain-flashcards/
 - Interactive flashcards with questions and detailed answers
 - Progress tracking
 - Topic-based organization
-- Mobile-friendly design 
+- Mobile-friendly design
+- Keyboard navigation support
+
+Last updated: January 21, 2024 
