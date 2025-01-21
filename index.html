@@ -29,6 +29,15 @@
             <div id="progress-text"></div>
         </div>
     </div>
-    <script type="module" src="./script.js"></script>
+    <script>
+        // Add error handling for module loading
+        window.addEventListener('error', function(e) {
+            console.error('Script error:', e);
+            document.body.innerHTML += '<div style="color: red; padding: 20px;">Error loading application. Please check console.</div>';
+        });
+    </script>
+    <script type="module">
+        import './script.js';
+    </script>
 </body>
 </html> 
