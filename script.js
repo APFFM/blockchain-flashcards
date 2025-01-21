@@ -1,40 +1,7 @@
-const topics = [
-  {
-    name: "Blockchain Fundamentals",
-    cards: [
-      {
-        question: "What is Blockchain?",
-        answer: "Distributed immutable ledger for secure transactions",
-        detail: "A blockchain is a chain of blocks containing transaction data, cryptographically linked and maintained across a distributed network. Key characteristics: Decentralization (no central authority), Transparency (public verification), Immutability (permanent records), Security (cryptographic proofs)."
-      },
-      {
-        question: "Key Blockchain vs DLT difference",
-        answer: "Blockchain is a type of DLT with chained blocks",
-        detail: "DLT (Distributed Ledger Technology) is the broader category. Blockchain specifically uses cryptographic chaining of blocks. All blockchains are DLTs, but not all DLTs use blockchain structure."
-      },
-      {
-        question: "4 Blockchain Types by Access",
-        answer: "Public Permissionless, Public Permissioned, Private Permissionless, Private Permissioned",
-        detail: "1. Public Permissionless: Bitcoin, Ethereum (open to all)\n2. Public Permissioned: Land registries (viewable by all, edit by authorized)\n3. Private Permissionless: Consortium chains\n4. Private Permissioned: Enterprise solutions like Hyperledger"
-      }
-    ]
-  },
-  {
-    name: "Cryptography & Security",
-    cards: [
-      {
-        question: "Symmetric vs Asymmetric Encryption",
-        answer: "Single key vs key pair system",
-        detail: "Symmetric: AES, uses same key for encrypt/decrypt. Fast but insecure key exchange.\nAsymmetric: RSA/ECC, uses public/private keys. Enables secure digital signatures and PKI."
-      },
-      {
-        question: "3 Hash Function Properties",
-        answer: "Collision Resistance, Hiding, Puzzle-Friendliness",
-        detail: "1. Collision Resistance: Hard to find x≠y with H(x)=H(y)\n2. Hiding: Can't determine input from output\n3. Puzzle-Friendly: No better strategy than random guessing"
-      }
-    ]
-  }
-];
+import courseContent from './content.js';
+
+// Replace the existing topics array
+let topics = courseContent.topics;
 
 let currentTopic = 0;
 let currentCard = 0;
@@ -67,11 +34,62 @@ function renderTopics() {
 }
 
 function renderCard() {
-  const card = topics[currentTopic].cards[currentCard];
+  let card = topics[currentTopic].cards[currentCard];
   
-  document.getElementById('question').textContent = showDetail ? card.answer : card.question;
-  document.getElementById('answer').textContent = showDetail ? '' : card.answer;
-  document.getElementById('detail').textContent = showDetail ? card.detail : '';
+  // Card background with subtle shadow
+  fill(255);
+  stroke(200);
+  drawingContext.shadowOffsetX = 5;
+  drawingContext.shadowOffsetY = 5;
+  drawingContext.shadowBlur = 10;
+  drawingContext.shadowColor = 'rgba(0,0,0,0.2)';
+  rect(50, 100, width-100, 300, 10);
+  drawingContext.shadowColor = 'rgba(0,0,0,0)';
+  
+  // Question/Answer section
+  fill(0);
+  textSize(24);
+  textStyle(BOLD);
+  text(showDetail ? "Answer:" : "Question:", 70, 130);
+  
+  textSize(20);
+  textStyle(NORMAL);
+  text(showDetail ? card.answer : card.question, 70, 160, width-140);
+  
+  // Detail section with improved formatting
+  if (showDetail && card.detail) {
+    textSize(16);
+    fill(80);
+    let detailY = 200;
+    
+    // Split detail into paragraphs
+    let paragraphs = card.detail.split('\n');
+    paragraphs.forEach(p => {
+      text(p, 70, detailY, width-140);
+      detailY += textWidth(p) / (width-140) * 25 + 30;
+    });
+  }
+  
+  // Show additional fields if present
+  if (showDetail) {
+    let y = 320;
+    textSize(14);
+    
+    if (card.diagram) {
+      fill(100);
+      text("Diagram:", 70, y);
+      fill(0);
+      text(card.diagram, 140, y);
+      y += 30;
+    }
+    
+    if (card.critical) {
+      fill(100);
+      text("Critical Thinking:", 70, y);
+      fill(0);
+      text(card.critical, 180, y);
+    }
+  }
   
   // Mark card as seen
   const cardId = `${currentTopic}-${currentCard}`;
@@ -127,6 +145,51 @@ function setupEventListeners() {
       updateProgress();
     }
   };
+}
+
+// Enhance the controls with better visual feedback
+function drawControls() {
+  let buttonY = 420;
+  let buttonHeight = 40;
+  
+  // Detail toggle button
+  let isHovered = mouseX > 50 && mouseX < 170 && mouseY > buttonY && mouseY < buttonY + buttonHeight;
+  fill(isHovered ? color(0, 119, 182) : 200);
+  rect(50, buttonY, 120, buttonHeight, 5);
+  fill(isHovered ? 255 : 0);
+  textAlign(CENTER, CENTER);
+  text(showDetail ? "Hide Details" : "Show Details", 110, buttonY + buttonHeight/2);
+  
+  // Navigation buttons with hover effects
+  ['Previous', 'Next', 'Reset'].forEach((label, i) => {
+    let x = 200 + i * 140;
+    isHovered = mouseX > x && mouseX < x + 120 && mouseY > buttonY && mouseY < buttonY + buttonHeight;
+    fill(isHovered ? color(0, 119, 182) : 200);
+    rect(x, buttonY, 120, buttonHeight, 5);
+    fill(isHovered ? 255 : 0);
+    text(label, x + 60, buttonY + buttonHeight/2);
+  });
+  
+  textAlign(LEFT, BASELINE);
+}
+
+// Add keyboard navigation
+function keyPressed() {
+  if (keyCode === LEFT_ARROW) {
+    if (currentCard > 0) currentCard--;
+    else if (currentTopic > 0) {
+      currentTopic--;
+      currentCard = topics[currentTopic].cards.length-1;
+    }
+  } else if (keyCode === RIGHT_ARROW) {
+    if (currentCard < topics[currentTopic].cards.length-1) currentCard++;
+    else if (currentTopic < topics.length-1) {
+      currentTopic++;
+      currentCard = 0;
+    }
+  } else if (keyCode === 32) { // Spacebar
+    showDetail = !showDetail;
+  }
 }
 
 // Initialize the app
