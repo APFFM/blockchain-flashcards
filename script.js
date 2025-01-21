@@ -7,14 +7,20 @@ let showDetail = false;
 let progress = JSON.parse(localStorage.getItem('flashcardProgress')) || {};
 
 function init() {
-  renderTopics();
-  renderCard();
-  updateProgress();
-  setupEventListeners();
+  try {
+    renderTopics();
+    renderCard();
+    updateProgress();
+    setupEventListeners();
+  } catch (error) {
+    console.error('Error initializing app:', error);
+  }
 }
 
 function renderTopics() {
   const topicsContainer = document.getElementById('topics');
+  if (!topicsContainer) return;
+  
   topicsContainer.innerHTML = '';
   
   topics.forEach((topic, index) => {
@@ -32,77 +38,101 @@ function renderTopics() {
 }
 
 function renderCard() {
-  if (!topics[currentTopic] || !topics[currentTopic].cards[currentCard]) {
-    console.error('Invalid topic or card index');
-    return;
-  }
-  
-  const card = topics[currentTopic].cards[currentCard];
-  
-  document.getElementById('question').textContent = card.question || '';
-  document.getElementById('answer').textContent = showDetail ? (card.answer || '') : '';
-  document.getElementById('detail').textContent = showDetail ? (card.detail || '') : '';
-  
-  // Mark card as seen
-  const cardId = `${currentTopic}-${currentCard}`;
-  if (!progress[cardId]) {
-    progress[cardId] = true;
-    localStorage.setItem('flashcardProgress', JSON.stringify(progress));
-    updateProgress();
+  try {
+    if (!topics[currentTopic] || !topics[currentTopic].cards[currentCard]) {
+      console.error('Invalid topic or card index');
+      return;
+    }
+    
+    const card = topics[currentTopic].cards[currentCard];
+    const questionEl = document.getElementById('question');
+    const answerEl = document.getElementById('answer');
+    const detailEl = document.getElementById('detail');
+    
+    if (questionEl) questionEl.textContent = card.question || '';
+    if (answerEl) answerEl.textContent = showDetail ? (card.answer || '') : '';
+    if (detailEl) detailEl.textContent = showDetail ? (card.detail || '') : '';
+    
+    // Mark card as seen
+    const cardId = `${currentTopic}-${currentCard}`;
+    if (!progress[cardId]) {
+      progress[cardId] = true;
+      localStorage.setItem('flashcardProgress', JSON.stringify(progress));
+      updateProgress();
+    }
+  } catch (error) {
+    console.error('Error rendering card:', error);
   }
 }
 
 function updateProgress() {
-  const total = topics.reduce((acc, t) => acc + t.cards.length, 0);
-  const learned = Object.values(progress).filter(v => v).length;
-  const percent = (learned/total * 100).toFixed(1);
-  
-  const progressBar = document.getElementById('progress');
-  if (progressBar) {
-    progressBar.style.width = `${percent}%`;
-  }
-  
-  const progressText = document.getElementById('progress-text');
-  if (progressText) {
-    progressText.textContent = `${percent}% Progress (${learned}/${total} cards)`;
+  try {
+    const total = topics.reduce((acc, t) => acc + t.cards.length, 0);
+    const learned = Object.values(progress).filter(v => v).length;
+    const percent = (learned/total * 100).toFixed(1);
+    
+    const progressBar = document.getElementById('progress');
+    if (progressBar) {
+      progressBar.style.width = `${percent}%`;
+    }
+    
+    const progressText = document.getElementById('progress-text');
+    if (progressText) {
+      progressText.textContent = `${percent}% Progress (${learned}/${total} cards)`;
+    }
+  } catch (error) {
+    console.error('Error updating progress:', error);
   }
 }
 
 function setupEventListeners() {
-  document.getElementById('toggle-detail').onclick = () => {
-    showDetail = !showDetail;
-    renderCard();
-  };
+  const toggleBtn = document.getElementById('toggle-detail');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const resetBtn = document.getElementById('reset');
+
+  if (toggleBtn) {
+    toggleBtn.onclick = () => {
+      showDetail = !showDetail;
+      renderCard();
+    };
+  }
   
-  document.getElementById('prev').onclick = () => {
-    if (currentCard > 0) {
-      currentCard--;
-    } else if (currentTopic > 0) {
-      currentTopic--;
-      currentCard = topics[currentTopic].cards.length - 1;
-    }
-    renderTopics();
-    renderCard();
-  };
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      if (currentCard > 0) {
+        currentCard--;
+      } else if (currentTopic > 0) {
+        currentTopic--;
+        currentCard = topics[currentTopic].cards.length - 1;
+      }
+      renderTopics();
+      renderCard();
+    };
+  }
   
-  document.getElementById('next').onclick = () => {
-    if (currentCard < topics[currentTopic].cards.length - 1) {
-      currentCard++;
-    } else if (currentTopic < topics.length - 1) {
-      currentTopic++;
-      currentCard = 0;
-    }
-    renderTopics();
-    renderCard();
-  };
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      if (currentCard < topics[currentTopic].cards.length - 1) {
+        currentCard++;
+      } else if (currentTopic < topics.length - 1) {
+        currentTopic++;
+        currentCard = 0;
+      }
+      renderTopics();
+      renderCard();
+    };
+  }
   
-  document.getElementById('reset').onclick = () => {
-    if (confirm('Are you sure you want to reset your progress?')) {
-      progress = {};
-      localStorage.setItem('flashcardProgress', JSON.stringify(progress));
-      updateProgress();
-    }
-  };
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      if (confirm('Are you sure you want to reset your progress?')) {
+        progress = {};
+        localStorage.setItem('flashcardProgress', JSON.stringify(progress));
+        updateProgress();
+      }
+    };
+  }
 
   // Add keyboard navigation
   document.addEventListener('keydown', (e) => {
@@ -133,4 +163,4 @@ function setupEventListeners() {
 }
 
 // Initialize the app
-init(); 
+window.addEventListener('DOMContentLoaded', init); 
