@@ -1,4 +1,4 @@
-import courseContent from './content.js';
+import courseContent from '/blockchain-flashcards/content.js';
 
 // Replace the existing topics array
 let topics = courseContent.topics;
