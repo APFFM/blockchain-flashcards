@@ -1,8 +1,6 @@
 import courseContent from './content.js';
 
-// Replace the existing topics array
 let topics = courseContent.topics;
-
 let currentTopic = 0;
 let currentCard = 0;
 let showDetail = false;
@@ -34,11 +32,16 @@ function renderTopics() {
 }
 
 function renderCard() {
+  if (!topics[currentTopic] || !topics[currentTopic].cards[currentCard]) {
+    console.error('Invalid topic or card index');
+    return;
+  }
+  
   const card = topics[currentTopic].cards[currentCard];
   
-  document.getElementById('question').textContent = card.question;
-  document.getElementById('answer').textContent = showDetail ? card.answer : '';
-  document.getElementById('detail').textContent = showDetail ? card.detail : '';
+  document.getElementById('question').textContent = card.question || '';
+  document.getElementById('answer').textContent = showDetail ? (card.answer || '') : '';
+  document.getElementById('detail').textContent = showDetail ? (card.detail || '') : '';
   
   // Mark card as seen
   const cardId = `${currentTopic}-${currentCard}`;
@@ -54,9 +57,15 @@ function updateProgress() {
   const learned = Object.values(progress).filter(v => v).length;
   const percent = (learned/total * 100).toFixed(1);
   
-  document.getElementById('progress').style.width = `${percent}%`;
-  document.getElementById('progress-text').textContent = 
-    `${percent}% Progress (${learned}/${total} cards)`;
+  const progressBar = document.getElementById('progress');
+  if (progressBar) {
+    progressBar.style.width = `${percent}%`;
+  }
+  
+  const progressText = document.getElementById('progress-text');
+  if (progressText) {
+    progressText.textContent = `${percent}% Progress (${learned}/${total} cards)`;
+  }
 }
 
 function setupEventListeners() {
